@@ -6,4 +6,4 @@ require 'pp'
 
 a = SAScraper.new
 
-a.login
+a.main_logic("http://forums.somethingawful.com/showthread.php?threadid=3793023")
