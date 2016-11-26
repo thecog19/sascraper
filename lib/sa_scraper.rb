@@ -19,8 +19,11 @@ class SAScraper
 
   def get_posts(page)
     posts = page.parser.css("table")
+    posts.xpath('//comment()').each { |comment| comment.remove }
+     posts.search('p.editedby').each { |p| p.remove }
     posts.each do |post|
       post.css("td.postbody").each do |td|
+        pp td
         open('myfile.txt', 'a+') do |f|
           f.puts td
         end
