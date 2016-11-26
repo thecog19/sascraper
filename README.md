@@ -2,13 +2,25 @@ The SA project is a tool to scrape and store LPs from SA in a easy to read forma
 
 
 Parts 
+
+
   Scraper
+
+
     Returns all post authors, Post content, and quoted posts
     Can be run from an admin panel by giving it a thread url and login credentials. 
+
+    
   Database
+
+
     Stores Post Author, Unique Post ID, Post Content, quoted post AND POST PARENT, in order to make a linked list. 
     Separate DB to save images for backup. 
+
+
   Rails
+
+
     Displays posts with pagination every 30 posts
     Displays them in order
     Can retain HTML and Images
