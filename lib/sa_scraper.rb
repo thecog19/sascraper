@@ -30,12 +30,36 @@ class SAScraper
     posts = page.parser.css("table")
     posts.xpath('//comment()').each { |comment| comment.remove }
      posts.search('p.editedby').each { |p| p.remove }
+
+    thread_id = page.parser.css('div#thread')
+    #have to figure out how to grab thread id
+    pp thread_id
+
     posts.each do |post|
 
       post.css("dt.author").each do |author|
         open('myfile.txt', 'a+') do |f|
           #this will be replaced with a db
           f.puts author.text
+        end
+      end
+
+      post.css("dd.registered").each do |reg_date|
+        open('myfile.txt', 'a+') do |f|
+          #this will be replaced with a db
+          f.puts reg_date.text
+        end
+      end
+
+      post.css("dd.title").each do |title|
+        open('myfile.txt', 'a+') do |f|
+          f.puts title.text
+        end
+      end
+
+      post.css("div.bbc-center").css("img.img").each do |avatar|
+        open('myfile.txt', 'a+') do |f|
+          f.puts avatar.attribute('src')
         end
       end
 
