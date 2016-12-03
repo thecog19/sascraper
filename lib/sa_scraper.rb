@@ -3,12 +3,14 @@ class SAScraper
     @agent = Mechanize.new
   end
 
-  def main_logic(thread)
+  def main_logic(thread, file_name = "myfile.txt" )
     page = login(thread)
     time = Time.now
+    thread_id = get_thread_id(page)
+    store(file_name, "thread id is #{thread_id}")
     loop do
       sleep(0.5)
-      posts = get_posts(page)
+      posts = get_posts(page, file_name)
       break unless page.link_with(:text => '›')
       page = page.link_with(:text => '›').click
       time_now = Time.new
@@ -26,50 +28,48 @@ class SAScraper
     my_page.click_button
   end
 
-  def get_posts(page)
+  def get_thread_id(page)
+     thread_id = page.parser.at('div#thread').attributes['class']
+     thread_id.to_s[7..-1]
+  end
+
+  def sanitize(page)
+    
+  end
+
+  def get_posts(page, file_name = "myfile.txt")
     posts = page.parser.css("table")
     posts.xpath('//comment()').each { |comment| comment.remove }
-     posts.search('p.editedby').each { |p| p.remove }
-
-    thread_id = page.parser.css('div#thread')
-    #have to figure out how to grab thread id
-    pp thread_id
-
+    posts.search('p.editedby').each { |p| p.remove }
     posts.each do |post|
 
-      post.css("dt.author").each do |author|
-        open('myfile.txt', 'a+') do |f|
-          #this will be replaced with a db
-          f.puts author.text
-        end
-      end
+      get_and_store(post, "dt.author", file_name)
 
-      post.css("dd.registered").each do |reg_date|
-        open('myfile.txt', 'a+') do |f|
-          #this will be replaced with a db
-          f.puts reg_date.text
-        end
-      end
+      get_and_store(post, "dd.registered", file_name)
 
-      post.css("dd.title").each do |title|
-        open('myfile.txt', 'a+') do |f|
-          f.puts title.text
-        end
-      end
+      get_and_store(post, "dd.title", file_name)
 
       post.css("div.bbc-center").css("img.img").each do |avatar|
-        open('myfile.txt', 'a+') do |f|
+        open(file_name, 'a+') do |f|
           f.puts avatar.attribute('src')
         end
       end
 
-      post.css("td.postbody").each do |post|
-        open('myfile.txt', 'a+') do |f|
-          #this will be replaced with a db
-          f.puts post
-        end
-      end
+      get_and_store(post, "td.postbody", file_name)
 
+    end
+
+  end
+
+  def get_and_store(post, target, file_name)
+    post.css(target).each do |post|
+      store(file_name, post)
+    end
+  end
+
+  def store(file_name, content)
+    open(file_name, 'a+') do |f|
+      f.puts content
     end
   end
 
